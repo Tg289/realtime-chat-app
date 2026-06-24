@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String            @id @default(uuid())
+  name      String
+  email     String            @unique
+  password  String
+  image     String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  members   ChatMember[]
+  messages  Message[]
+  reactions MessageReaction[]
+}
+
+model ChatRoom {
+  id        String       @id @default(uuid())
+  name      String?
+  isGroup   Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  members   ChatMember[]
+  messages  Message[]
+}
+
+model ChatMember {
+  id     String   @id @default(uuid())
+  userId String
+  roomId String
+  room   ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roomId])
+}
+
+model Message {
+  id        String            @id @default(uuid())
+  content   String?
+  imageUrl  String?
+  seen      Boolean           @default(false)
+
+  isDeleted Boolean           @default(false)
+
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  senderId  String
+  roomId    String
+
+  room      ChatRoom          @relation(fields: [roomId], references: [id])
+  sender    User              @relation(fields: [senderId], references: [id])
+
+  reactions MessageReaction[]
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  emoji     String
+  userId    String
+  messageId String
+  createdAt DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, messageId, emoji])
+}
