@@ -45,18 +45,13 @@ model Message {
   content   String?
   imageUrl  String?
   seen      Boolean           @default(false)
-
-  isDeleted Boolean           @default(false)
-
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
-
   senderId  String
   roomId    String
-
+  isDeleted Boolean           @default(false)
   room      ChatRoom          @relation(fields: [roomId], references: [id])
   sender    User              @relation(fields: [senderId], references: [id])
-
   reactions MessageReaction[]
 }
 

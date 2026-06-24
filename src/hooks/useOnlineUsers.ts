@@ -1,23 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { socket } from "@/lib/socket";
+import { useSocket } from "./useSocket";
 
 export default function useOnlineUsers() {
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const socket = useSocket();
+
+  const [onlineUsers, setOnlineUsers] =
+    useState<string[]>([]);
 
   useEffect(() => {
+    if (!socket) return;
+
     socket.on(
       "online-users",
-      (users: string[]) => {
-        setOnlineUsers(users);
+      (data) => {
+        if (Array.isArray(data)) {
+          setOnlineUsers(data);
+        } else {
+          setOnlineUsers(
+            data?.users || []
+          );
+        }
       }
     );
 
     return () => {
       socket.off("online-users");
     };
-  }, []);
+  }, [socket]);
 
   return onlineUsers;
 }

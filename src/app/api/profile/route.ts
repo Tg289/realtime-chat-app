@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
@@ -14,9 +13,7 @@ export async function PATCH(
         authOptions
       );
 
-    if (
-      !session?.user?.email
-    ) {
+    if (!session?.user) {
       return NextResponse.json(
         {
           error:
@@ -29,17 +26,17 @@ export async function PATCH(
     }
 
     const {
-  name,
-  image,
-} = await req.json();
+      name,
+      image,
+    } = await req.json();
 
     const user =
       await prisma.user.update({
         where: {
-          email:
-            session.user.email,
+          id: (
+            session.user as any
+          ).id,
         },
-
         data: {
           name,
           image,
@@ -55,7 +52,7 @@ export async function PATCH(
     return NextResponse.json(
       {
         error:
-          "Failed to update profile",
+          "Something went wrong",
       },
       {
         status: 500,

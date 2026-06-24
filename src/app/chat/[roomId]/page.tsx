@@ -12,8 +12,7 @@ export default async function ChatPage({
     roomId: string;
   }>;
 }) {
-  const { roomId } =
-    await params;
+  const { roomId } = await params;
 
   const room =
     await prisma.chatRoom.findUnique({
@@ -29,6 +28,8 @@ export default async function ChatPage({
         },
 
         messages: {
+          take: 50,
+
           include: {
             sender: true,
 
@@ -40,7 +41,7 @@ export default async function ChatPage({
           },
 
           orderBy: {
-            createdAt: "asc",
+            createdAt: "desc",
           },
         },
       },
@@ -49,6 +50,8 @@ export default async function ChatPage({
   if (!room) {
     notFound();
   }
+
+  room.messages.reverse();
 
   return (
     <div className="flex flex-col lg:grid lg:grid-cols-4 h-screen bg-zinc-950 text-white">
