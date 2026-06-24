@@ -1,6 +1,6 @@
 import "./globals.css";
 
-import { SessionProviderWrapper } from "@/components/auth/SessionProviderWrapper";
+import SessionProviderWrapper from "@/components/providers/SessionProviderWrapper";
 
 export default function RootLayout({
   children,
